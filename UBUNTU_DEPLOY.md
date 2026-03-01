@@ -249,7 +249,40 @@ chmod +x run.sh
 dotnet publish -r linux-arm64 --self-contained true
 ```
 
----
+### 问题 5: X11 界面图标或字体无法显示（渲染问题）
+
+在 Ubuntu X11 环境中，可能出现按钮图标空白、字体显示异常的问题，根本原因是：
+
+1. **缺少 emoji/图标字体**：应用已将 emoji 替换为标准 Unicode 符号，但仍建议安装 Noto 字体以获得最佳显示效果。
+
+```bash
+# 安装 Noto 字体（中文、通用符号）
+sudo apt install -y fonts-noto fonts-noto-cjk fonts-noto-color-emoji
+
+# 安装 DejaVu 字体（常用 Unicode 符号）
+sudo apt install -y fonts-dejavu fonts-dejavu-core
+
+# 更新字体缓存
+fc-cache -fv
+```
+
+2. **GPU/OpenGL 驱动问题**：应用已配置 X11 渲染降级策略（GLX → EGL → 软件渲染），无需额外配置。如仍有渲染问题，可强制使用软件渲染：
+
+```bash
+# 禁用硬件加速，强制软件渲染
+export LIBGL_ALWAYS_SOFTWARE=1
+./DHPlugin.Host
+```
+
+3. **X11 显示环境变量**：
+
+```bash
+# 确保 DISPLAY 已设置
+export DISPLAY=:0
+# 如使用远程 X11 转发
+export DISPLAY=:10.0
+```
+
 
 ## 快速参考卡
 
