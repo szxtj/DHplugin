@@ -1,0 +1,10 @@
+{
+  "id": "CPlusPlusEditor",
+  "name": "C++ 代码编辑器",
+  "version": "1.0.0",
+  "description": "C++ 代码编辑器插件，支持语法高亮、代码编译和运行。调用系统 GCC 编译器，支持一键运行 C++ 代码。",
+  "author": "DHPlugin Team",
+  "iconPath": "icon.png",
+  "minimumHostVersion": "1.0.0",
+  "dependencies": []
+}

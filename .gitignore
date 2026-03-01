@@ -1,0 +1,84 @@
+# .gitignore for .NET
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio cache/options
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+*.dll
+*.pdb
+*.exe
+*.so
+*.dylib
+
+# Publish output
+publish/
+dist/
+
+# Plugin packages
+*.dhplugin
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+nuget.config
+
+# Test results
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Linux
+*~
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# App data
+AppData/
+PluginData/

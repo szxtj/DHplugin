@@ -1,0 +1,21 @@
+<Project>
+  <PropertyGroup>
+    <Version>1.0.0</Version>
+    <Authors>DHPlugin Team</Authors>
+    <Company>DHPlugin</Company>
+    <Copyright>Copyright © DHPlugin Team 2026</Copyright>
+    
+    <!-- .NET 8 配置 -->
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    
+    <!-- 跨平台支持 -->
+    <RuntimeIdentifiers>win-x64;win-x86;osx-x64;osx-arm64;linux-x64</RuntimeIdentifiers>
+    
+    <!-- 调试配置 -->
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+</Project>
