@@ -9,5 +9,13 @@
 
     <Application.Styles>
         <FluentTheme />
+        <!-- Provide font fallback for Linux/X11: Inter (embedded) → Noto Sans → DejaVu → system sans-serif.
+             This ensures Chinese text and symbols render correctly even without emoji fonts installed. -->
+        <Style Selector="TextBlock">
+            <Setter Property="FontFamily" Value="Inter,Noto Sans,Noto Sans CJK SC,DejaVu Sans,sans-serif"/>
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="FontFamily" Value="Inter,Noto Sans,Noto Sans CJK SC,DejaVu Sans,sans-serif"/>
+        </Style>
     </Application.Styles>
 </Application>

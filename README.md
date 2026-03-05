@@ -1,229 +1,278 @@
-# DHPlugin - 跨平台插件系统
+# DHPlugin
 
-基于 Avalonia UI 构建的高度解耦的跨平台插件系统，支持 macOS、Windows (最低 Windows 7) 和主流 Linux 发行版。
+DHPlugin 是一个基于 Avalonia UI 的插件式宿主程序。当前仓库已经统一为新的打包体系：
 
-## 特性
+- 主程序安装包和插件安装包独立发布。
+- 只支持 `win-x64`、`osx-arm64`、`linux-x64`、`linux-arm64`。
+- 所有开发者和用户文档已归并到本 README。
 
-- 🧩 **高度解耦** - 未安装任何插件时，主程序是一个空壳
-- 📦 **插件管理** - 支持插件的安装、卸载、启用、禁用
-- 🔌 **热插拔** - 插件可动态加载和卸载
-- 🌍 **跨平台** - 一套代码，三端通用 (macOS/Windows/Linux)
-- 🎨 **现代 UI** - 基于 Avalonia UI，支持 Fluent 设计
-- 📝 **SDK 支持** - 提供插件开发 SDK 和模板
+## 功能概览
 
-## 系统要求
+- 空壳主程序，插件决定功能。
+- 插件安装、启用、禁用、卸载。
+- 插件包格式为 `.dhplugin`。
+- 示例插件 `CPlusPlusEditor` 提供代码编辑、编译和运行功能。
 
-### 运行时要求
-- **.NET 8.0 Runtime** (已包含在自包含发布中)
-- **操作系统**:
-  - **macOS**: 10.14+ (Intel x64 / Apple Silicon ARM64)
-  - **Windows**: 7 SP1+ (x64 / x86)
-  - **Linux**: 
-    - x64: glibc 2.17+ (Ubuntu 18.04+, CentOS 7+, Debian 9+)
-    - ARM64: glibc 2.17+ (树莓派 4+, Jetson, ARM 服务器)
+## 平台与产物格式
 
-### 开发要求
-- .NET 8.0 SDK
-- IDE: Visual Studio 2022 / Rider / VS Code
+| 平台 | 架构 | RID | 主程序包格式 |
+|---|---|---|---|
+| Windows | x64 | `win-x64` | `.zip` |
+| macOS | ARM64 | `osx-arm64` | `.dmg` |
+| Linux | x64 | `linux-x64` | `.tar.gz` |
+| Linux | ARM64 | `linux-arm64` | `.tar.gz` |
+
+标识映射说明：
+
+- Linux `uname -m` 的 `x86_64` 对应 x64。
+- Linux `uname -m` 的 `aarch64` 对应 ARM64。
 
 ## 项目结构
 
-```
+```text
 DHplugin/
 ├── src/
-│   ├── DHPlugin.Host/          # 主程序 (空壳应用)
-│   ├── DHPlugin.Core/          # 插件管理核心
-│   ├── DHPlugin.Abstractions/  # 插件抽象接口
-│   ├── DHPlugin.Sdk/           # 插件开发 SDK
+│   ├── DHPlugin.Host/
+│   ├── DHPlugin.Core/
+│   ├── DHPlugin.Abstractions/
+│   ├── DHPlugin.Sdk/
 │   └── Plugins/
-│       └── CPlusPlusEditor/    # 示例插件：C++ 编辑器
-├── build.sh                    # macOS/Linux 构建脚本
-├── build.bat                   # Windows 构建脚本
-└── DHPlugin.sln                # 解决方案文件
+│       └── CPlusPlusEditor/
+├── pack-plugin.sh
+├── pack-plugin.bat
+├── pack-host.sh
+├── pack-host.bat
+├── pack-all.sh
+├── pack-all.bat
+└── README.md
 ```
 
-## 快速开始
+## 快速开始（开发模式）
 
-### 构建
+运行主程序：
 
-**macOS / Linux:**
 ```bash
-chmod +x build.sh
-./build.sh
+dotnet run --project src/DHPlugin.Host/DHPlugin.Host.csproj
 ```
 
-**Windows:**
-```batch
-build.bat
-```
+## 统一打包流程
 
-> 💡 **注意**: 构建脚本会在**当前系统**上交叉编译所有平台的版本
-> - 在 macOS 上可以构建 Windows 和 Linux 版本
-> - 在 Windows 上可以构建 macOS 和 Linux 版本
-> - 在 Linux 上可以构建 macOS 和 Windows 版本
+### 1. 打插件安装包
 
-### 运行
+Unix:
 
-构建完成后，在 `publish` 目录找到对应平台的可执行文件：
-
-| 平台 | 架构 | 路径 | 说明 |
-|------|------|------|------|
-| macOS | Intel (x64) | `publish/macos-x64/DHPlugin.Host` | Intel Mac |
-| macOS | Apple Silicon (ARM64) | `publish/macos-arm64/DHPlugin.Host` | M1/M2/M3 Mac |
-| Linux | x64 | `publish/linux-x64/DHPlugin.Host` | 主流发行版 |
-| Linux | ARM64 | `publish/linux-arm64/DHPlugin.Host` | 树莓派/ARM 服务器 |
-| Windows | x64 | `publish\windows-x64\DHPlugin.Host.exe` | Win7+ 64 位 |
-| Windows | x86 | `publish\windows-x86\DHPlugin.Host.exe` | Win7+ 32 位 |
-
-## 插件开发
-
-### 创建插件
-
-1. 复制 `publish/sdk/templates/SimplePlugin` 目录
-2. 修改 `manifest.json` 配置
-3. 实现 `IPlugin` 接口
-4. 运行 `dotnet build` 生成 `.dhplugin` 包
-
-### manifest.json 格式
-
-```json
-{
-  "id": "MyPlugin",              // 插件唯一标识
-  "name": "我的插件",             // 显示名称
-  "version": "1.0.0",            // 版本号
-  "description": "插件描述",      // 详细描述
-  "author": "作者名",            // 作者
-  "iconPath": "icon.png",        // 图标路径 (可选)
-  "minimumHostVersion": "1.0.0", // 最低主机版本
-  "dependencies": []             // 依赖插件 ID 列表
-}
-```
-
-### IPlugin 接口
-
-```csharp
-public interface IPlugin
-{
-    PluginManifest Manifest { get; }
-    PluginState State { get; }
-    
-    Task InitializeAsync(IPluginContext context, CancellationToken cancellationToken = default);
-    Task EnableAsync(CancellationToken cancellationToken = default);
-    Task DisableAsync(CancellationToken cancellationToken = default);
-    Task ShutdownAsync(CancellationToken cancellationToken = default);
-}
-```
-
-### 插件上下文 (IPluginContext)
-
-```csharp
-public interface IPluginContext
-{
-    string HostVersion { get; }
-    T? GetService<T>() where T : class;
-    void RegisterService<T>(T service) where T : class;
-    string GetDataDirectory();
-    string GetConfigDirectory();
-    ILogger GetLogger();
-    void RegisterUiContribution(UiContribution contribution);
-    IPlugin? GetPlugin(string pluginId);
-    void PublishEvent(string eventName, object? data = null);
-    void SubscribeEvent(string eventName, Action<string, object?> handler);
-}
-```
-
-## 示例插件：C++ 代码编辑器
-
-功能特性:
-- 📝 C++ 代码编辑
-- 🔨 调用系统 GCC/Clang 编译器
-- ▶️ 一键编译运行
-- 📋 输出查看
-
-### 使用要求
-
-需要系统安装 C++ 编译器:
-
-**macOS:**
 ```bash
-xcode-select --install
+./pack-plugin.sh
 ```
 
-**Ubuntu/Debian (x64/ARM64):**
+Windows:
+
+```bat
+pack-plugin.bat
+```
+
+行为：
+
+- 扫描 `src/Plugins/*/*.csproj`。
+- 使用 `Release` 构建插件项目。
+- 收集 `.dhplugin` 到 `dist/plugins/`。
+
+### 2. 打主程序安装包
+
+Unix:
+
 ```bash
-sudo apt install g++
+./pack-host.sh
 ```
 
-**CentOS/RHEL/Fedora:**
+Windows:
+
+```bat
+pack-host.bat
+```
+
+行为：
+
+- 发布四个平台主程序。
+- 输出到 `dist/host/<platform>/`。
+- 主程序包不附带插件包。
+
+### 3. 一次性全量打包
+
+Unix:
+
 ```bash
-sudo yum install gcc-c++
-# 或
-sudo dnf install gcc-c++
+./pack-all.sh
 ```
 
-**Linux ARM64 (树莓派/开发板):**
+Windows:
+
+```bat
+pack-all.bat
+```
+
+## 产物目录
+
+```text
+dist/
+├── plugins/
+│   └── *.dhplugin
+└── host/
+    ├── windows-x64/
+    │   └── *.zip
+    ├── macos-arm64/
+    │   └── *.dmg
+    ├── linux-x64/
+    │   └── *.tar.gz
+    └── linux-arm64/
+        └── *.tar.gz
+```
+
+## 插件包生成机制
+
+以 `src/Plugins/CPlusPlusEditor` 为例：
+
+- `.dhplugin` 由 `src/Plugins/CPlusPlusEditor/CPlusPlusEditor.csproj` 中的 `PackPlugin` 目标生成。
+- 触发条件是 `Release` 构建。
+
+稳定命令：
+
 ```bash
-# 树莓派/Debian ARM
-sudo apt install g++
-
-# 使用交叉编译器
-sudo apt install gcc-aarch64-linux-gnu
-sudo apt install gcc-arm-linux-gnueabihf
+dotnet build src/Plugins/CPlusPlusEditor/CPlusPlusEditor.csproj -c Release
 ```
 
-**Windows:**
-- 安装 MinGW 或 WSL
-- 或使用 MSVC 编译器
+产物：
 
-## 插件包格式
+- 源项目目录：`src/Plugins/CPlusPlusEditor/CPlusPlusEditor.dhplugin`
+- 统一发布目录：`dist/plugins/CPlusPlusEditor.dhplugin`
 
-插件包是 `.dhplugin` 格式的 ZIP 文件，包含:
+是否全平台通用：
 
+- 当前插件包是一份全平台通用（托管代码）。
+- 如果插件未来引入原生库（`.so/.dylib/.dll`），则需按平台分包。
+
+## 插件安装与管理
+
+### 推荐方式：程序内安装
+
+1. 启动主程序。
+2. 点击 `Install Plugin`。
+3. 选择 `dist/plugins/*.dhplugin`。
+4. 在插件列表中启用。
+
+### 手动安装路径
+
+| 系统 | 路径 |
+|---|---|
+| Linux | `~/.local/share/DHPlugin/Plugins/` |
+| macOS | `~/Library/Application Support/DHPlugin/Plugins/` |
+| Windows | `%APPDATA%\DHPlugin\Plugins\` |
+
+手动安装后建议重启主程序。
+
+### 卸载与清理
+
+- UI 中选择插件后执行卸载。
+- 或手动删除插件目录和同名 `.dhplugin` 文件。
+
+Linux 示例：
+
+```bash
+rm -rf ~/.local/share/DHPlugin/Plugins/CPlusPlusEditor/
+rm -f ~/.local/share/DHPlugin/Plugins/CPlusPlusEditor.dhplugin
 ```
-MyPlugin.dhplugin/
-├── manifest.json           # 插件元数据
-├── MyPlugin.dll           # 插件程序集
-├── MyPlugin.pdb           # 调试符号 (可选)
-└── assets/                # 资源文件 (可选)
+
+## Ubuntu / Linux 部署
+
+### x64 部署
+
+在构建机：
+
+```bash
+./pack-host.sh
+scp dist/host/linux-x64/*.tar.gz user@ubuntu:~/
 ```
 
-## API 参考
+在目标机：
 
-### UI 贡献点
-
-```csharp
-public static class UiContributionPoints
-{
-    public const string MainMenu = "mainMenu";      // 主菜单
-    public const string MainContent = "mainContent"; // 主内容区
-    public const string ToolBar = "toolBar";        // 工具栏
-    public const string StatusBar = "statusBar";    // 状态栏
-    public const string SideBar = "sideBar";        // 侧边栏
-    public const string SettingsPage = "settingsPage"; // 设置页
-}
+```bash
+tar -xzf DHPlugin-Host-linux-x64-*.tar.gz
+cd DHPlugin-Host-linux-x64-*
+./run.sh
 ```
 
-### 插件状态
+### ARM64 部署
 
-```csharp
-public enum PluginState
-{
-    Unloaded,   // 未加载
-    Loaded,     // 已加载
-    Enabled,    // 已启用
-    Disabled,   // 已禁用
-    Error       // 错误
-}
+在构建机：
+
+```bash
+./pack-host.sh
+scp dist/host/linux-arm64/*.tar.gz user@ubuntu-arm:~/
+```
+
+在目标机：
+
+```bash
+tar -xzf DHPlugin-Host-linux-arm64-*.tar.gz
+cd DHPlugin-Host-linux-arm64-*
+./run.sh
+```
+
+### Linux 依赖
+
+宿主程序是 self-contained，但 GUI 依赖仍需系统库：
+
+```bash
+sudo apt update
+sudo apt install -y libgtk-3-0 libx11-6 libxrandr2 libxi6
+```
+
+若使用 C++ 编辑器插件：
+
+```bash
+sudo apt install -y g++
+```
+
+## 常见问题
+
+### 1. 插件安装后看不到
+
+- 检查插件是否安装到正确路径。
+- 重启宿主程序。
+- 确认插件在 UI 中已启用。
+
+### 2. Linux 启动权限问题
+
+```bash
+chmod +x DHPlugin.Host run.sh
+```
+
+### 3. Linux 图形环境报错
+
+```bash
+echo "$DISPLAY"
+export DISPLAY=:0
+```
+
+### 4. macOS 无法产出 DMG
+
+- `pack-host.sh` 使用 `hdiutil`，需要在 macOS 运行。
+
+## 可配置参数
+
+脚本支持环境变量：
+
+- `CONFIGURATION`，默认 `Release`。
+- `VERSION`，默认当天日期（`YYYYMMDD`）。
+- `OUTPUT_ROOT`，默认 `dist`。
+- `CLEAN`，默认 `1`。
+
+示例：
+
+```bash
+VERSION=1.0.0 OUTPUT_ROOT=dist ./pack-all.sh
 ```
 
 ## 许可证
 
 MIT License
-
-## 贡献
-
-欢迎提交 Issue 和 Pull Request!
-
----
-
-**DHPlugin Team** © 2026

@@ -11,9 +11,19 @@
         <!-- 工具栏 -->
         <Border Grid.Row="0" Padding="10" Background="#252525">
             <StackPanel Orientation="Horizontal" Spacing="10">
-                <Button Content="🔨 编译" Click="OnCompile" IsEnabled="{Binding CanCompile}"/>
+                <Button Click="OnCompile" IsEnabled="{Binding CanCompile}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="M2,2 H10 V4 H8 V8 H10 V10 H2 Z" Width="12" Height="12"/>
+                        <TextBlock Text="Compile" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
                 <Button Content="▶️ 运行" Click="OnRun" IsEnabled="{Binding CanRun}"/>
-                <Button Content="🧹 清空输出" Click="OnClearOutput"/>
+                <Button Click="OnClearOutput">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="M3,2 H9 V3 H11 V4 H1 V3 H3 Z M3,5 H9 V11 H3 Z" Width="12" Height="12"/>
+                        <TextBlock Text="Clear Output" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
                 
                 <Separator Width="20"/>
                 
