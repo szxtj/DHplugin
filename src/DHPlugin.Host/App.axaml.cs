@@ -24,6 +24,10 @@ public partial class App : Application
             Path.Combine(appDataPath, "Config")
         );
 
+        // 注册 Zig 跨平台 C++ 编译器服务，插件可通过 IPluginContext.GetService<ICompilerService>() 使用
+        PluginManager.RegisterService<DHPlugin.Abstractions.ICompilerService>(
+            new DHPlugin.Core.ZigCompilerService(PluginManager.GetLogger()));
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var viewModel = new MainWindowViewModel(PluginManager);

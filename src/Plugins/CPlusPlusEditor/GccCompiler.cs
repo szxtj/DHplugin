@@ -31,14 +31,33 @@ public class GccCompiler
             // 写入源代码
             await File.WriteAllTextAsync(sourceFile, code, cancellationToken);
 
-            // 获取编译器路径
+            // 优先尝试宿主注册的 ICompilerService（如 Zig 编译器）
+            var compilerService = _context.GetService<ICompilerService>();
+            if (compilerService != null && compilerService.IsAvailable)
+            {
+                _logger.Info($"使用宿主编译器服务：{compilerService.CompilerName}");
+                var svcResult = await compilerService.CompileCppAsync(
+                    sourceFile, executableFile, cancellationToken: cancellationToken);
+
+                return new CompileResult
+                {
+                    Success = svcResult.Success,
+                    ExecutablePath = svcResult.ExecutablePath,
+                    Output = svcResult.Output,
+                    ErrorOutput = svcResult.ErrorOutput,
+                    ExitCode = svcResult.ExitCode,
+                    TempDirectory = tempDir
+                };
+            }
+
+            // 回退到系统 GCC / Clang
             var compilerPath = FindCompiler();
             if (string.IsNullOrEmpty(compilerPath))
             {
                 return new CompileResult
                 {
                     Success = false,
-                    ErrorOutput = "未找到 GCC 编译器。请安装 g++ 并确保其在 PATH 中。"
+                    ErrorOutput = "未找到编译器。请安装 Zig（推荐）或 g++，并确保其在 PATH 中。"
                 };
             }
 
