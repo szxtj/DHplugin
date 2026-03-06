@@ -49,11 +49,13 @@ DHplugin/
 
 ## 快速开始（开发模式）
 
-运行主程序：
+在仓库根目录运行主程序：
 
 ```bash
-dotnet run --project src/DHPlugin.Host/DHPlugin.Host.csproj
+dotnet run
 ```
+
+说明：根目录新增了 `DHPlugin.Runner.csproj`，用于将入口转发到 `src/DHPlugin.Host`。
 
 ## 统一打包流程
 

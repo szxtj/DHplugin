@@ -3,7 +3,7 @@ using System;
 
 namespace DHPlugin.Host;
 
-class Program
+public class Program
 {
     [STAThread]
     public static void Main(string[] args) => BuildAvaloniaApp()
