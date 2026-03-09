@@ -42,6 +42,11 @@ public static class UiContributionPoints
 public class UiContribution
 {
     /// <summary>
+    /// 所属插件 ID
+    /// </summary>
+    public required string PluginId { get; set; }
+
+    /// <summary>
     /// 贡献点名称
     /// </summary>
     public required string ContributionPoint { get; set; }

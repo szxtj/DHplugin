@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="VisualProgramming\**\*.cs" />
+    <EmbeddedResource Remove="VisualProgramming\**\*" />
+    <None Remove="VisualProgramming\**\*" />
+    <AvaloniaXaml Remove="VisualProgramming\**\*.axaml" />
+    <AvaloniaResource Remove="VisualProgramming\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.8" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.8" />
+    <PackageReference Include="Oxyplot.Avalonia" Version="2.1.0-Avalonia11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\DHPlugin.Sdk\DHPlugin.Sdk.csproj" />
+    <ProjectReference Include="VisualProgramming\VisualProgramming.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\Plugin.Package.targets" />
+</Project>

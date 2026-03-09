@@ -1,3 +1,4 @@
+using System.Runtime.Loader;
 using DHPlugin.Abstractions;
 
 namespace DHPlugin.Core;
@@ -11,6 +12,11 @@ public class PluginInfo
     /// 插件实例
     /// </summary>
     public IPlugin? Instance { get; set; }
+
+    /// <summary>
+    /// 插件加载上下文
+    /// </summary>
+    public AssemblyLoadContext? LoadContext { get; set; }
     
     /// <summary>
     /// 插件元数据

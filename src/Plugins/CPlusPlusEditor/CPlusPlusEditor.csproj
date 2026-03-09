@@ -4,32 +4,18 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.6" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.6" />
+    <PackageReference Include="Avalonia" Version="11.3.8" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.8" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\DHPlugin.Abstractions\DHPlugin.Abstractions.csproj" />
   </ItemGroup>
 
-  <!-- 插件打包目标 -->
-  <Target Name="PackPlugin" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
-    <PropertyGroup>
-      <PluginOutputDir>$(OutputDir)PluginPackage</PluginOutputDir>
-    </PropertyGroup>
-    
-    <MakeDir Directories="$(PluginOutputDir)" />
-    
-    <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll" DestinationFolder="$(PluginOutputDir)" />
-    <Copy SourceFiles="$(OutputPath)$(AssemblyName).pdb" DestinationFolder="$(PluginOutputDir)" Condition="Exists('$(OutputPath)$(AssemblyName).pdb')" />
-    <Copy SourceFiles="manifest.json" DestinationFolder="$(PluginOutputDir)" />
-    
-    <ZipDirectory SourceDirectory="$(PluginOutputDir)" DestinationFile="$(OutputDir)$(AssemblyName).dhplugin" Overwrite="true" />
-    
-    <Message Importance="high" Text="插件包已创建：$(OutputDir)$(AssemblyName).dhplugin" />
-  </Target>
+  <Import Project="..\Plugin.Package.targets" />
 
 </Project>

@@ -49,6 +49,7 @@ dist/
 
 # Plugin packages
 *.dhplugin
+PluginPackage/
 
 # NuGet
 *.nupkg

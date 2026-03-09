@@ -1,0 +1,9 @@
+{
+  "id": "VisualProgrammingPlugin",
+  "name": "图形化编程",
+  "version": "1.0.0",
+  "description": "图形化编程插件，集成设计器、流程图编辑器、算法导入与 C++ 导出能力。",
+  "author": "DHPlugin Team",
+  "minimumHostVersion": "1.0.0",
+  "dependencies": []
+}

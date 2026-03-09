@@ -13,7 +13,7 @@ public class MainWindowViewModel : ViewModelBase
 {
     private readonly PluginManager _pluginManager;
     private PluginInfo? _selectedPlugin;
-    private string? _activeTabPluginId;
+    private PluginTab? _activeTab;
     private bool _isViewReady;
     private bool _hasLoadedTabs;
 
@@ -31,12 +31,12 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    public string? ActiveTabPluginId
+    public PluginTab? ActiveTab
     {
-        get => _activeTabPluginId;
+        get => _activeTab;
         set
         {
-            _activeTabPluginId = value;
+            _activeTab = value;
             OnPropertyChanged();
         }
     }
@@ -127,9 +127,9 @@ public class MainWindowViewModel : ViewModelBase
             if (tab != null)
             {
                 PluginTabs.Remove(tab);
-                if (ActiveTabPluginId == e.Manifest.Id)
+                if (ActiveTab?.PluginId == e.Manifest.Id)
                 {
-                    ActiveTabPluginId = PluginTabs.FirstOrDefault()?.PluginId;
+                    ActiveTab = PluginTabs.FirstOrDefault();
                 }
             }
 
@@ -209,7 +209,9 @@ public class MainWindowViewModel : ViewModelBase
         {
             if (!PluginTabs.Any(t => t.PluginId == plugin.Manifest.Id))
             {
-                var contributions = _pluginManager.GetUiContributions(UiContributionPoints.MainContent);
+                var contributions = _pluginManager.GetUiContributions(UiContributionPoints.MainContent)
+                    .Where(contribution => contribution.PluginId == plugin.Manifest.Id);
+
                 foreach (var contribution in contributions)
                 {
                     if (contribution.UiElement is Control control)
@@ -227,9 +229,9 @@ public class MainWindowViewModel : ViewModelBase
         }
 
         // 更新当前标签
-        if (ActiveTabPluginId == null || !enabledPluginIds.Contains(ActiveTabPluginId))
+        if (ActiveTab == null || !enabledPluginIds.Contains(ActiveTab.PluginId))
         {
-            ActiveTabPluginId = PluginTabs.FirstOrDefault()?.PluginId;
+            ActiveTab = PluginTabs.FirstOrDefault();
         }
 
         // 触发属性通知

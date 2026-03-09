@@ -4,6 +4,7 @@ namespace CPlusPlusEditor;
 
 public class CPlusPlusEditorPlugin : IPlugin
 {
+    private const string MainViewContributionId = "CPlusPlusEditor.MainView";
     private IPluginContext? _context;
     private CppEditorViewModel? _viewModel;
     
@@ -45,8 +46,9 @@ public class CPlusPlusEditorPlugin : IPlugin
         
         _context.RegisterUiContribution(new UiContribution
         {
+            PluginId = Manifest.Id,
             ContributionPoint = UiContributionPoints.MainContent,
-            Id = "CPlusPlusEditor.MainView",
+            Id = MainViewContributionId,
             Name = "C++ 编辑器",
             UiElement = editorView,
             Order = 10
@@ -60,8 +62,11 @@ public class CPlusPlusEditorPlugin : IPlugin
     public Task DisableAsync(CancellationToken cancellationToken = default)
     {
         State = PluginState.Disabled;
+
+        _context?.UnregisterUiContribution(MainViewContributionId);
         
         _viewModel?.Dispose();
+        _viewModel = null;
         
         _context?.GetLogger().Info("C++ 编辑器插件已禁用");
         
@@ -70,7 +75,9 @@ public class CPlusPlusEditorPlugin : IPlugin
 
     public Task ShutdownAsync(CancellationToken cancellationToken = default)
     {
+        _context?.UnregisterUiContribution(MainViewContributionId);
         _viewModel?.Dispose();
+        _viewModel = null;
         _context = null;
         State = PluginState.Unloaded;
         

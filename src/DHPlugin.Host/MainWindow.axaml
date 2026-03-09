@@ -101,34 +101,31 @@
             <Grid Grid.Column="1">
                 <!-- 浏览器式标签页导航（包含内容区） -->
                 <TabControl ItemsSource="{Binding PluginTabs}"
-                            SelectedItem="{Binding ActiveTabPluginId, Mode=TwoWay}"
+                            SelectedItem="{Binding ActiveTab, Mode=TwoWay}"
                             Background="Transparent"
                             BorderThickness="0"
                             Margin="0"
                             IsVisible="{Binding HasActivePlugin}">
+                    <TabControl.Styles>
+                        <Style Selector="TabControl TabItem">
+                            <Setter Property="Background" Value="#252525"/>
+                            <Setter Property="Foreground" Value="#888888"/>
+                            <Setter Property="CornerRadius" Value="4,4,0,0"/>
+                            <Setter Property="Padding" Value="16,10"/>
+                            <Setter Property="Margin" Value="2,0,0,0"/>
+                        </Style>
+                        <Style Selector="TabControl TabItem:selected">
+                            <Setter Property="Background" Value="#1E1E1E"/>
+                            <Setter Property="Foreground" Value="#FFFFFF"/>
+                        </Style>
+                        <Style Selector="TabControl TabItem:pointerover">
+                            <Setter Property="Background" Value="#353535"/>
+                            <Setter Property="Foreground" Value="#CCCCCC"/>
+                        </Style>
+                    </TabControl.Styles>
                     <TabControl.ItemTemplate>
-                        <DataTemplate>
-                            <TabItem Header="{Binding PluginName}"
-                                     Background="Transparent"
-                                     Foreground="#CCCCCC"
-                                     Padding="16,10"
-                                     Margin="2,0,0,0">
-                                <TabItem.Styles>
-                                    <Style Selector="TabItem">
-                                        <Setter Property="Background" Value="#252525"/>
-                                        <Setter Property="Foreground" Value="#888888"/>
-                                        <Setter Property="CornerRadius" Value="4,4,0,0"/>
-                                    </Style>
-                                    <Style Selector="TabItem:selected">
-                                        <Setter Property="Background" Value="#1E1E1E"/>
-                                        <Setter Property="Foreground" Value="#FFFFFF"/>
-                                    </Style>
-                                    <Style Selector="TabItem:pointerover">
-                                        <Setter Property="Background" Value="#353535"/>
-                                        <Setter Property="Foreground" Value="#CCCCCC"/>
-                                    </Style>
-                                </TabItem.Styles>
-                            </TabItem>
+                        <DataTemplate x:DataType="vm:PluginTab">
+                            <TextBlock Text="{Binding PluginName}"/>
                         </DataTemplate>
                     </TabControl.ItemTemplate>
                     <TabControl.ContentTemplate>

@@ -1,6 +1,5 @@
 using System.IO.Compression;
 using System.Reflection;
-using System.Runtime.Loader;
 using System.Text.Json;
 using DHPlugin.Abstractions;
 
@@ -66,6 +65,8 @@ public class PluginManager : IPluginContext
         {
             await ExtractPackageAsync(package, cancellationToken);
         }
+
+        pluginDirs = Directory.GetDirectories(_pluginsDirectory);
         
         // 加载所有插件
         foreach (var dir in pluginDirs)
@@ -214,7 +215,10 @@ public class PluginManager : IPluginContext
             var assemblyPath = Path.Combine(pluginPath, $"{manifest.Id}.dll");
             if (File.Exists(assemblyPath))
             {
-                var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
+                var loadContext = new PluginLoadContext(assemblyPath);
+                pluginInfo.LoadContext = loadContext;
+
+                var assembly = loadContext.LoadFromAssemblyPath(assemblyPath);
                 var pluginType = assembly.GetTypes()
                     .FirstOrDefault(t => typeof(IPlugin).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
                 
@@ -246,6 +250,14 @@ public class PluginManager : IPluginContext
         catch (Exception ex)
         {
             _logger.Error($"加载插件失败：{pluginPath}", ex);
+
+            var pluginId = Path.GetFileName(pluginPath);
+            if (_plugins.TryGetValue(pluginId, out var pluginInfo))
+            {
+                pluginInfo.State = PluginState.Error;
+                pluginInfo.ErrorMessage = ex.Message;
+                pluginInfo.ErrorException = ex;
+            }
         }
     }
     
@@ -551,6 +563,11 @@ public class PluginManager : IPluginContext
     public void RegisterUiContribution(UiContribution contribution)
     {
         _uiContributions[contribution.Id] = contribution;
+    }
+
+    public void UnregisterUiContribution(string contributionId)
+    {
+        _uiContributions.Remove(contributionId);
     }
     
     public IEnumerable<UiContribution> GetUiContributions(string contributionPoint)

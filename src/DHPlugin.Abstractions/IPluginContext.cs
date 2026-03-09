@@ -44,6 +44,11 @@ public interface IPluginContext
     /// 注册 UI 贡献点（使用贡献对象）
     /// </summary>
     void RegisterUiContribution(UiContribution contribution);
+
+    /// <summary>
+    /// 注销 UI 贡献点
+    /// </summary>
+    void UnregisterUiContribution(string contributionId);
     
     /// <summary>
     /// 获取其他已启用的插件

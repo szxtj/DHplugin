@@ -1,0 +1,35 @@
+<Project>
+  <PropertyGroup>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <PluginOutputDir Condition="'$(PluginOutputDir)' == ''">$(TargetDir)PluginPackage</PluginOutputDir>
+    <PluginPackagePath Condition="'$(PluginPackagePath)' == ''">$(TargetDir)$(AssemblyName).dhplugin</PluginPackagePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PluginPackageContent Include="$(MSBuildProjectDirectory)/manifest.json" Condition="Exists('$(MSBuildProjectDirectory)/manifest.json')" />
+    <PluginPackageContent Include="$(MSBuildProjectDirectory)/icon.png" Condition="Exists('$(MSBuildProjectDirectory)/icon.png')" />
+  </ItemGroup>
+
+  <Target Name="PackPlugin" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <RemoveDir Directories="$(PluginOutputDir)" Condition="Exists('$(PluginOutputDir)')" />
+    <MakeDir Directories="$(PluginOutputDir)" />
+
+    <ItemGroup>
+      <_PluginBuildOutput Include="$(TargetDir)**/*"
+                          Exclude="$(PluginOutputDir)/**;$(TargetDir)**/*.dhplugin" />
+      <_PluginPackageContent Include="@(PluginPackageContent)" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(_PluginBuildOutput)"
+          DestinationFiles="@(_PluginBuildOutput->'$(PluginOutputDir)/%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+
+    <Copy SourceFiles="@(_PluginPackageContent)"
+          DestinationFiles="@(_PluginPackageContent->'$(PluginOutputDir)/%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+
+    <ZipDirectory SourceDirectory="$(PluginOutputDir)" DestinationFile="$(PluginPackagePath)" Overwrite="true" />
+
+    <Message Importance="high" Text="插件包已创建：$(PluginPackagePath)" />
+  </Target>
+</Project>
