@@ -12,6 +12,7 @@ DHPlugin 是一个基于 Avalonia UI 的插件式宿主程序。当前仓库已�
 - 插件安装、启用、禁用、卸载。
 - 插件包格式为 `.dhplugin`。
 - 示例插件 `CPlusPlusEditor` 提供代码编辑、编译和运行功能。
+- 宿主程序内置 **Zig 编译器服务**（`ICompilerService`），为插件的 C++ 代码编译提供跨平台底层支持。
 
 ## 平台与产物格式
 
@@ -153,6 +154,46 @@ dotnet build src/Plugins/CPlusPlusEditor/CPlusPlusEditor.csproj -c Release
 - 当前插件包是一份全平台通用（托管代码）。
 - 如果插件未来引入原生库（`.so/.dylib/.dll`），则需按平台分包。
 
+## Zig 编译器服务（ICompilerService）
+
+宿主程序在启动时自动注册 `ZigCompilerService`，插件可通过插件上下文获取该服务来编译 C++ 代码：
+
+```csharp
+var compilerService = context.GetService<ICompilerService>();
+if (compilerService != null && compilerService.IsAvailable)
+{
+    var result = await compilerService.CompileCppAsync(sourceFile, outputFile);
+}
+```
+
+### 设计说明
+
+| 组件 | 位置 | 作用 |
+|---|---|---|
+| `ICompilerService` | `DHPlugin.Abstractions` | 跨平台 C++ 编译器抽象接口，供插件调用 |
+| `ZigCompilerService` | `DHPlugin.Core` | 基于 `zig c++` 的实现，支持全部4个目标平台 |
+| 注册点 | `DHPlugin.Host/App.axaml.cs` | 宿主启动时自动注册，插件无需关心实现细节 |
+
+### 为什么选择 Zig
+
+- Zig 内置了完整的 C/C++ 工具链（基于 LLVM/Clang），无需单独安装 GCC。
+- `zig c++` 命令天然支持 `win-x64`、`osx-arm64`、`linux-x64`、`linux-arm64` 四个平台。
+- 同一个 `zig` 二进制可以交叉编译到任意目标，便于跨平台构建场景。
+
+### 安装 Zig
+
+从 [https://ziglang.org/download/](https://ziglang.org/download/) 下载对应平台的预编译包，解压后将 `zig`（Windows 为 `zig.exe`）所在目录加入系统 `PATH` 即可。
+
+常见安装路径（宿主程序会自动探测）：
+
+| 平台 | 自动探测路径（示例） |
+|---|---|
+| Windows | `%LOCALAPPDATA%\zig\zig.exe`、`C:\zig\zig.exe` |
+| macOS | `/opt/homebrew/bin/zig`、`/usr/local/bin/zig` |
+| Linux | `~/.local/bin/zig`、`/usr/local/bin/zig` |
+
+若 Zig 不可用，`CPlusPlusEditor` 插件会自动回退到系统 `g++` / `clang++`。
+
 ## 插件安装与管理
 
 ### 推荐方式：程序内安装
@@ -230,6 +271,16 @@ sudo apt install -y libgtk-3-0 libx11-6 libxrandr2 libxi6
 ```
 
 若使用 C++ 编辑器插件：
+
+推荐安装 Zig（提供内置 C++ 工具链，无需额外依赖）：
+
+```bash
+# 从 https://ziglang.org/download/ 下载对应平台二进制，解压后将 zig 加入 PATH
+# 或使用包管理器（如 snap）：
+sudo snap install zig --classic --beta
+```
+
+也可以继续使用系统 GCC（Zig 不可用时自动回退）：
 
 ```bash
 sudo apt install -y g++
